@@ -13,6 +13,9 @@ import typing
 # other modules are imported.
 import vllm.env_override  # noqa: F401
 
+# Custom fork identifier
+print(f"Using Custom Stopping Criteria fork!")
+
 MODULE_ATTRS = {
     "AsyncEngineArgs": ".engine.arg_utils:AsyncEngineArgs",
     "EngineArgs": ".engine.arg_utils:EngineArgs",
