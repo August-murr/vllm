@@ -81,6 +81,13 @@ class StopChecker:
             seq.stop_reason = stop_str
             return
 
+        # Check if custom stopping criteria is triggered.
+        if sampling_params.stopping_criteria is not None:
+            if sampling_params.stopping_criteria.stop(seq.output_text):
+                seq.status = SequenceStatus.FINISHED_STOPPED
+                seq.stop_reason = sampling_params.stopping_criteria.__class__.__name__
+                return
+
         # Check if the sequence has reached max_model_len.
         if seq.get_len() >= self._get_max_model_len(lora_req):
             seq.status = SequenceStatus.FINISHED_LENGTH_CAPPED

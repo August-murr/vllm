@@ -5,7 +5,7 @@ import copy
 from dataclasses import dataclass
 from enum import Enum, IntEnum
 from functools import cached_property
-from typing import Annotated, Any, Optional, Union
+from typing import Annotated, Any, Optional, Union, TYPE_CHECKING
 
 import msgspec
 from pydantic import BaseModel
@@ -13,6 +13,10 @@ from pydantic import BaseModel
 from vllm.logger import init_logger
 from vllm.logits_process import LogitsProcessor
 from vllm.transformers_utils.tokenizer import AnyTokenizer
+
+# Import at module level to avoid circular imports
+if TYPE_CHECKING:
+    from vllm.engine.output_processor.stopping_criteria import StoppingCriteria
 
 logger = init_logger(__name__)
 
@@ -175,6 +179,10 @@ class SamplingParams(
         allowed_token_ids: If provided, the engine will construct a logits
             processor which only retains scores for the given token ids.
             Defaults to None.
+        stopping_criteria: If provided, a custom stopping criteria instance
+            that inherits from StoppingCriteria. The criteria's stop() method
+            will be called with the current output text to determine if
+            generation should stop. Defaults to None.
         extra_args: Arbitrary additional args, that can be used by custom
             sampling implementations, plugins, etc. Not used by any in-tree
             sampling implementations.
@@ -210,6 +218,8 @@ class SamplingParams(
     include_stop_str_in_output: bool = False
     truncate_prompt_tokens: Optional[Annotated[int, msgspec.Meta(ge=1)]] = None
     output_kind: RequestOutputKind = RequestOutputKind.CUMULATIVE
+    stopping_criteria: Optional["StoppingCriteria"] = None
+    """Custom stopping criteria instance. Must inherit from StoppingCriteria."""
 
     # The below fields are not supposed to be used as an input.
     # They are set in post_init.
@@ -258,6 +268,7 @@ class SamplingParams(
         logit_bias: Optional[Union[dict[int, float], dict[str, float]]] = None,
         allowed_token_ids: Optional[list[int]] = None,
         extra_args: Optional[dict[str, Any]] = None,
+        stopping_criteria: Optional["StoppingCriteria"] = None,
     ) -> "SamplingParams":
         if logit_bias is not None:
             # Convert token_id to integer
@@ -300,6 +311,7 @@ class SamplingParams(
             logit_bias=logit_bias,
             allowed_token_ids=allowed_token_ids,
             extra_args=extra_args,
+            stopping_criteria=stopping_criteria,
         )
 
     def __post_init__(self) -> None:
@@ -563,6 +575,7 @@ class SamplingParams(
             f"{self.spaces_between_special_tokens}, "
             f"truncate_prompt_tokens={self.truncate_prompt_tokens}, "
             f"guided_decoding={self.guided_decoding}, "
+            f"stopping_criteria={self.stopping_criteria}, "
             f"extra_args={self.extra_args})")
 
 

@@ -29,6 +29,7 @@ MODULE_ATTRS = {
     "ModelRegistry": ".model_executor.models:ModelRegistry",
     "SamplingParams": ".sampling_params:SamplingParams",
     "PoolingParams": ".pooling_params:PoolingParams",
+    "StoppingCriteria": ".engine.output_processor.stopping_criteria:StoppingCriteria",
     "ClassificationOutput": ".outputs:ClassificationOutput",
     "ClassificationRequestOutput": ".outputs:ClassificationRequestOutput",
     "CompletionOutput": ".outputs:CompletionOutput",
@@ -45,6 +46,7 @@ if typing.TYPE_CHECKING:
     from vllm.engine.arg_utils import AsyncEngineArgs, EngineArgs
     from vllm.engine.async_llm_engine import AsyncLLMEngine
     from vllm.engine.llm_engine import LLMEngine
+    from vllm.engine.output_processor.stopping_criteria import StoppingCriteria
     from vllm.entrypoints.llm import LLM
     from vllm.executor.ray_utils import initialize_ray_cluster
     from vllm.inputs import PromptType, TextPrompt, TokensPrompt
@@ -80,6 +82,7 @@ __all__ = [
     "TextPrompt",
     "TokensPrompt",
     "SamplingParams",
+    "StoppingCriteria",
     "RequestOutput",
     "CompletionOutput",
     "PoolingOutput",
