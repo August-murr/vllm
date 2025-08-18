@@ -191,7 +191,9 @@ class SamplingParams(
     set to an integer k, will use only the last k tokens from the prompt
     (i.e., left truncation). If set to `None`, truncation is disabled."""
     output_kind: RequestOutputKind = RequestOutputKind.CUMULATIVE
-    stopping_criteria: Optional["StoppingCriteria"] = None
+    # Optional[StoppingCriteria] type. We use Any here because
+    # Optional[StoppingCriteria] type is not supported by msgspec.
+    stopping_criteria: Optional[Any] = None
     """stopping_criteria: If provided, a custom stopping criteria instance
             that inherits from StoppingCriteria. The criteria's stop() method
             will be called with the current output text to determine if
